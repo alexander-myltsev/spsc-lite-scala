@@ -2,7 +2,7 @@ package spsc
 import Algebra._
 
 case class Contraction(v: Var, pat: Pat) {
-	override def toString = v + " = " + pat
+  override def toString = v + " = " + pat
 }
 
 class Node(val expr: Term, val parent: Node, val contr: Contraction) {
@@ -19,6 +19,7 @@ class Node(val expr: Term, val parent: Node, val contr: Contraction) {
   def fnode: Option[Node] =
     ancestors.find { n => !trivial(n.expr) && renaming(expr, n.expr) }
 
+  override def toString = "[" + expr + ", " + contr + "]"
 }
 
 // pure functional partial tree
@@ -59,6 +60,6 @@ class Tree(val root: Node, val children: Map[Node, List[Node]]) {
     }
     sb.toString
   }
-  
-  override def toString = toString("", root)
+
+  override def toString = "\n" + toString("", root)
 }

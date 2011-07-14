@@ -4,10 +4,13 @@ abstract class Term {
   def size(): Int
 }
 
+/*
+// Replaced by Var for FlowAnalyser. See below.
 case class Var(name: String) extends Term {
   val size = 1
   override def toString = name
 }
+*/
 
 case class Ctr(name: String, args: List[Term]) extends Term {
   lazy val size = 1 + (args map { _.size }).sum
@@ -25,7 +28,7 @@ case class GCall(name: String, args: List[Term]) extends Term {
 
 case class Let(term: Term, bindings: List[(Var, Term)]) extends Term {
   lazy val size = 1 + (bindings map { _._2.size }).sum
-  override def toString = "let " + (bindings map {case (x, y) => x + "="+y} mkString(", ")) + " in " + term
+  override def toString = "let " + (bindings map { case (x, y) => x + "=" + y } mkString (", ")) + " in " + term
 }
 
 case class Pat(name: String, args: List[Var]) {
@@ -45,4 +48,17 @@ case class Program(defs: List[Def]) {
   val g = (defs :\ (Map[(String, String), GFun]())) { case (x: GFun, m) => m + ((x.name, x.p.name) -> x); case (_, m) => m }
   val gs = (defs :\ Map[String, List[GFun]]().withDefaultValue(Nil)) { case (x: GFun, m) => m + (x.name -> (x :: m(x.name))); case (_, m) => m }
   override def toString = defs.mkString("\n")
+}
+
+// For FlowAnalyser
+case class Var(varName: String) extends Name(varName) {
+}
+case class Name(name: String) extends Term {
+  val size = 1
+  override def toString = name
+}
+case class Rule(name: Name, term: Term) {
+  override def toString = name + " -> " + term + ";"
+}
+case class RuleName(ruleName: String) extends Name(ruleName) {
 }
